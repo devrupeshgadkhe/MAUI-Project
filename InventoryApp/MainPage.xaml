@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="InventoryApp.MainPage"
+             Title="Inventory"
+             BackgroundColor="{StaticResource PageBackground}">
+    <Grid Padding="18" RowDefinitions="Auto,Auto,Auto,Auto,*" RowSpacing="12">
+        <VerticalStackLayout Grid.Row="0" Spacing="3">
+            <Label Text="Inventory Management" FontSize="26" FontAttributes="Bold" TextColor="#17324D" />
+            <Label Text="Manage products and available stock" FontSize="14" TextColor="#60758A" />
+        </VerticalStackLayout>
+        <Border Grid.Row="1" Padding="14" BackgroundColor="White" Stroke="#DCE5EF" StrokeShape="RoundRectangle 12">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Add Product" FontSize="18" FontAttributes="Bold" TextColor="#17324D" />
+                <Entry x:Name="ProductNameEntry" Placeholder="Product name" ClearButtonVisibility="WhileEditing" />
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <Entry x:Name="QuantityEntry" Grid.Column="0" Placeholder="Quantity" Keyboard="Numeric" />
+                    <Entry x:Name="PriceEntry" Grid.Column="1" Placeholder="Price (₹)" Keyboard="Numeric" />
+                </Grid>
+                <Button Text="＋  Add Product" Clicked="AddProduct_Clicked" BackgroundColor="#1565C0" TextColor="White" CornerRadius="8" />
+            </VerticalStackLayout>
+        </Border>
+        <SearchBar x:Name="ProductSearchBar" Grid.Row="2" Placeholder="Search products..." TextChanged="ProductSearchBar_TextChanged" BackgroundColor="White" />
+        <Grid Grid.Row="3" ColumnDefinitions="*,Auto" Padding="2,0">
+            <Label Text="Products" FontSize="19" FontAttributes="Bold" TextColor="#17324D" />
+            <Label x:Name="StockSummaryLabel" Grid.Column="1" Text="0 products" TextColor="#60758A" VerticalOptions="Center" />
+        </Grid>
+        <CollectionView x:Name="ProductsCollection" Grid.Row="4" SelectionMode="None">
+            <CollectionView.EmptyView>
+                <VerticalStackLayout Padding="20" Spacing="6" VerticalOptions="Center" HorizontalOptions="Center">
+                    <Label Text="No products yet" FontSize="18" FontAttributes="Bold" TextColor="#60758A" HorizontalTextAlignment="Center" />
+                    <Label Text="Add your first product using the form above." TextColor="#60758A" HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Margin="0,0,0,8" Padding="12" BackgroundColor="White" Stroke="#DCE5EF" StrokeShape="RoundRectangle 10">
+                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="10">
+                            <Label Grid.Row="0" Text="{Binding Name}" FontSize="16" FontAttributes="Bold" TextColor="#17324D" LineBreakMode="TailTruncation" />
+                            <Label Grid.Row="1" Text="{Binding Quantity, StringFormat='Stock: {0}'}" TextColor="#60758A" />
+                            <VerticalStackLayout Grid.Column="1" Grid.RowSpan="2" Spacing="4" HorizontalOptions="End">
+                                <Label Text="{Binding Price, StringFormat='₹ {0:F2}'}" FontAttributes="Bold" TextColor="#1565C0" HorizontalTextAlignment="End" />
+                                <Button Text="Delete" FontSize="12" Padding="10,4" BackgroundColor="#EAF1FA" TextColor="#174A7E" CornerRadius="6" Clicked="DeleteProduct_Clicked" CommandParameter="{Binding Id}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>
