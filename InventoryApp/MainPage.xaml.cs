@@ -1,5 +1,6 @@
 using InventoryApp.Data;
 using InventoryApp.Models;
+using InventoryApp.Services;
 using System.Globalization;
 
 namespace InventoryApp;
@@ -8,6 +9,8 @@ public partial class MainPage : ContentPage
 {
     private readonly DatabaseService _database = new();
     private List<Product> _products = new();
+    private readonly UpdateService _updateService = new();
+    private bool _updateCheckStarted;
 
     public MainPage()
     {
@@ -18,6 +21,11 @@ public partial class MainPage : ContentPage
     {
         base.OnAppearing();
         await RefreshProductsAsync();
+        if (!_updateCheckStarted)
+        {
+            _updateCheckStarted = true;
+            _ = _updateService.CheckAndOfferUpdateAsync(this);
+        }
     }
 
     private async Task RefreshProductsAsync()
