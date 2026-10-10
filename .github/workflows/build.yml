@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: inventory-build-${{ github.ref }}
+  group: inventory-build-v2-${{ github.ref }}
   cancel-in-progress: true
 
 env:
