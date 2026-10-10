@@ -53,14 +53,15 @@ public class MainActivity : MauiAppCompatActivity
                 TextSize = 14,
                 Gravity = GravityFlags.Start
             };
-            message.SetTextColor(Android.Graphics.Color.DarkRed);
+            message.SetTextColor(Android.Graphics.Color.Red);
             message.SetBackgroundColor(Android.Graphics.Color.White);
             message.SetPadding(32, 32, 32, 32);
-            SetContentView(new ScrollView(this) { FillViewport = true }, new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent));
+
             var scroll = new ScrollView(this) { FillViewport = true };
             scroll.AddView(message);
-            SetContentView(scroll);
+            SetContentView(scroll, new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MatchParent,
+                ViewGroup.LayoutParams.MatchParent));
         }
         catch (Exception displayException)
         {
