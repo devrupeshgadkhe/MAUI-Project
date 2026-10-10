@@ -25,7 +25,7 @@
     <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
   </ItemGroup>
   <ItemGroup>
-    <MauiIcon Include="Resources\AppIcon\appicon.svg" />
+    <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#0B1F3A" />
     <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#1565C0" BaseSize="128,128" />
   </ItemGroup>
 </Project>
