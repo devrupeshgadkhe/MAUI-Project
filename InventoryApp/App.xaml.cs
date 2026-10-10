@@ -7,13 +7,30 @@ public partial class App : Application
         try
         {
             InitializeComponent();
-            MainPage = new MainPage();
         }
         catch (Exception ex)
         {
-            // Never leave the user with a blank screen if startup/XAML initialization fails.
-            MainPage = CreateStartupErrorPage(ex);
+            StartupException = ex;
         }
+    }
+
+    private Exception? StartupException { get; }
+
+    protected override Window CreateWindow(IActivationState? activationState)
+    {
+        Page page;
+        try
+        {
+            page = StartupException is null
+                ? new MainPage()
+                : CreateStartupErrorPage(StartupException);
+        }
+        catch (Exception ex)
+        {
+            page = CreateStartupErrorPage(ex);
+        }
+
+        return new Window(page);
     }
 
     private static ContentPage CreateStartupErrorPage(Exception exception)
@@ -31,11 +48,15 @@ public partial class App : Application
         {
             try
             {
-                Current!.MainPage = new MainPage();
+                var app = Current;
+                if (app?.Windows.FirstOrDefault() is { } window)
+                    window.Page = new MainPage();
             }
             catch (Exception retryException)
             {
-                Current!.MainPage = CreateStartupErrorPage(retryException);
+                var app = Current;
+                if (app?.Windows.FirstOrDefault() is { } window)
+                    window.Page = CreateStartupErrorPage(retryException);
             }
         };
 
@@ -74,7 +95,7 @@ public partial class App : Application
                         },
                         new Label
                         {
-                            Text = "The startup error is shown below so the app does not stay on a blank screen.",
+                            Text = "The app opened its diagnostic screen because startup failed.",
                             TextColor = Colors.Black
                         },
                         retryButton,
