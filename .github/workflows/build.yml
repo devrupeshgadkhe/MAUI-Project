@@ -90,7 +90,32 @@ jobs:
       - name: Restore Android target
         run: dotnet restore ${{ env.PROJECT }} -p:TargetFramework=net9.0-android
       - name: Publish APK
-        run: dotnet publish ${{ env.PROJECT }} -f net9.0-android -c Release --no-restore -p:AndroidPackageFormat=apk -p:AndroidKeyStore=false -p:PublishReadyToRun=false -p:ApplicationDisplayVersion=${{ steps.version.outputs.version }} -p:ApplicationVersion=${{ steps.version.outputs.versionCode }} -o artifacts/android
+        shell: pwsh
+        env:
+          APP_VERSION: ${{ steps.version.outputs.version }}
+          APP_VERSION_CODE: ${{ steps.version.outputs.versionCode }}
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          New-Item -ItemType Directory -Force artifacts/android | Out-Null
+          $args = @("publish", "${{ env.PROJECT }}", "-f", "net9.0-android", "-c", "Release", "--no-restore", "-p:AndroidPackageFormat=apk", "-p:PublishReadyToRun=false", "-p:ApplicationDisplayVersion=$env:APP_VERSION", "-p:ApplicationVersion=$env:APP_VERSION_CODE", "-o", "artifacts/android")
+          if ($env:ANDROID_KEYSTORE_BASE64 -and $env:ANDROID_KEYSTORE_PASSWORD -and $env:ANDROID_KEY_ALIAS -and $env:ANDROID_KEY_PASSWORD) {
+            $keystorePath = Join-Path $PWD "android-release.keystore"
+            [IO.File]::WriteAllBytes($keystorePath, [Convert]::FromBase64String($env:ANDROID_KEYSTORE_BASE64))
+            $args += "-p:AndroidKeyStore=true"
+            $args += "-p:AndroidSigningKeyStore=$keystorePath"
+            $args += "-p:AndroidSigningStorePass=$env:ANDROID_KEYSTORE_PASSWORD"
+            $args += "-p:AndroidSigningKeyAlias=$env:ANDROID_KEY_ALIAS"
+            $args += "-p:AndroidSigningKeyPass=$env:ANDROID_KEY_PASSWORD"
+            Write-Host "Publishing with the configured stable Android release keystore."
+          } else {
+            $args += "-p:AndroidKeyStore=false"
+            Write-Warning "Android release signing secrets are not configured. This APK is for testing; reliable in-place updates require the same private signing key for every release."
+          }
+          dotnet @args
+          if ($LASTEXITCODE -ne 0) { throw "Android publish failed with exit code $LASTEXITCODE" }
       - name: Name versioned APK
         shell: pwsh
         run: |
