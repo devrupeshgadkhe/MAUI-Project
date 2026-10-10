@@ -57,7 +57,7 @@ public class MainActivity : MauiAppCompatActivity
             message.SetBackgroundColor(Android.Graphics.Color.White);
             message.SetPadding(32, 32, 32, 32);
 
-            var scroll = new ScrollView(this) { FillViewport = true };
+            var scroll = new Android.Widget.ScrollView(this) { FillViewport = true };
             scroll.AddView(message);
             SetContentView(scroll, new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MatchParent,
