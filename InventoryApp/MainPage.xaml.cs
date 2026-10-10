@@ -20,7 +20,19 @@ public partial class MainPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await RefreshProductsAsync();
+        try
+        {
+            await RefreshProductsAsync();
+        }
+        catch (Exception ex)
+        {
+            // Keep the inventory UI visible even if local database initialization fails.
+            await MainThread.InvokeOnMainThreadAsync(() =>
+                DisplayAlert("Inventory data error",
+                    $"The inventory screen opened, but the local database could not be loaded. {ex.Message}",
+                    "OK"));
+        }
+
         if (!_updateCheckStarted)
         {
             _updateCheckStarted = true;
